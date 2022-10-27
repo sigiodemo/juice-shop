@@ -9,7 +9,7 @@ pipeline {
     POLARIS_ACCESS_TOKEN = credentials('POLARIS_TOKEN')
     SEEKER_TOKEN = credentials('SEEKER_TOKEN')
     SERVER_START = "npm run"
-    SEEKER_STIFF = "java -javaagent:seeker/seeker-agent.jar -jar target/jhipster-sample-application-0.0.1-SNAPSHOT.jar"
+    SEEKER_STUFF = "java -javaagent:seeker/seeker-agent.jar -jar target/jhipster-sample-application-0.0.1-SNAPSHOT.jar"
     SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
     SERVER_WORKINGDIR = ""
     SEEKER_RUN_TIME = 180
@@ -40,7 +40,7 @@ pipeline {
       }
     }
 
-    stage('polaris') {
+    stage('Polaris') {
       steps {
         sh '''
           BRIDGE=https://sig-repo.synopsys.com/artifactory/bds-integrations-release/com/synopsys/integration/synopsys-action/0.1.72/ci-package-0.1.72-linux64.zip
@@ -55,7 +55,8 @@ pipeline {
         '''
       }
     }
-    stage('Clean Up') {
+
+    stage('Clean Workspace') {
       steps {
         cleanWs()
       }
