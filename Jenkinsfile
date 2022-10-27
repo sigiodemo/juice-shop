@@ -53,7 +53,7 @@ pipeline {
           curl -fLsS -o $WORKSPACE_TMP/bridge.zip $BRIDGE
           unzip -qo -d $WORKSPACE_TMP/bridge $WORKSPACE_TMP/bridge.zip
           $WORKSPACE_TMP/bridge/bridge --stage polaris polaris.assessment.types='["SAST","SCA"]'
-        """
+        '''
       }
     }
 
