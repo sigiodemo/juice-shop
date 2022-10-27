@@ -9,7 +9,8 @@ pipeline {
     POLARIS_ACCESS_TOKEN = credentials('POLARIS_TOKEN')
     CODEDX_TOKEN = credentials('CODEDX_TOKEN')
     SEEKER_TOKEN = credentials('SEEKER_TOKEN')
-    SERVER_START = "npm run" #java -javaagent:seeker/seeker-agent.jar -jar target/jhipster-sample-application-0.0.1-SNAPSHOT.jar"
+    SERVER_START = "npm run"
+    SEEKER_STIFF = "java -javaagent:seeker/seeker-agent.jar -jar target/jhipster-sample-application-0.0.1-SNAPSHOT.jar"
     SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
     SERVER_WORKINGDIR = ""
     SEEKER_RUN_TIME = 180
