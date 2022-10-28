@@ -6,7 +6,6 @@ pipeline {
     PROJECT = 'juice-shop'
     VERSION = '1.0'
     BRANCH = 'main'
-    POLARIS_ACCESS_TOKEN = credentials('POLARIS_TOKEN')
     WORKSPACE_TMP = '/tmp'
   }
 
@@ -35,7 +34,7 @@ pipeline {
 
     stage('Polaris') {
       steps {
-        withCredentials([string(credentialsId: 'POLARIS_ACCESS_TOKEN', variable: 'BRIDGE_POLARIS_ACCESSTOKEN')]) {
+        withCredentials([string(credentialsId: 'POLARIS_TOKEN', variable: 'BRIDGE_POLARIS_ACCESSTOKEN')]) {
           script {
             status = sh returnStatus: true, script: """
               export BRIDGE=https://sig-repo.synopsys.com/artifactory/bds-integrations-release/com/synopsys/integration/synopsys-action/0.1.72/ci-package-0.1.72-linux64.zip
