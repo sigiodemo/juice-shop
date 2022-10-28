@@ -93,6 +93,7 @@ pipeline {
             return 1
           fi
         '''
+        }
       }
     }
 
