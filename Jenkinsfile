@@ -1,3 +1,5 @@
+def BRIDGE = https://sig-repo.synopsys.com/artifactory/bds-integrations-release/com/synopsys/integration/synopsys-action/0.1.72/ci-package-0.1.72-linux64.zip
+
 pipeline {
   agent any
 
@@ -10,12 +12,6 @@ pipeline {
   }
 
   stages{
-    stage('NPM Install') {
-      steps {
-        sh 'npm install'
-      }
-    }
-
     stage('Set Up Environment') {
       steps {
         sh '''
@@ -32,12 +28,17 @@ pipeline {
       }
     }
 
+    stage('NPM Install') {
+      steps {
+        sh 'npm install'
+      }
+    }
+
     stage('Polaris') {
       steps {
         withCredentials([string(credentialsId: 'POLARIS_TOKEN', variable: 'BRIDGE_POLARIS_ACCESSTOKEN')]) {
           script {
-            status = sh returnStatus: true, script: """
-              export BRIDGE=https://sig-repo.synopsys.com/artifactory/bds-integrations-release/com/synopsys/integration/synopsys-action/0.1.72/ci-package-0.1.72-linux64.zip
+            status = sh returnStatus: true, script: '''
               export BRIDGE_POLARIS_SERVERURL=$POLARIS_SERVER_URL
               export BRIDGE_POLARIS_APPLICATION_NAME=$APPLICATION
               export BRIDGE_POLARIS_PROJECT_NAME=$PROJECT
@@ -45,7 +46,7 @@ pipeline {
               curl -fLsS -o $WORKSPACE_TMP/bridge.zip $BRIDGE
               unzip -qo -d $WORKSPACE_TMP/bridge $WORKSPACE_TMP/bridge.zip
               $WORKSPACE_TMP/bridge/bridge --stage polaris polaris.assessment.types='["SAST","SCA"]'
-            """
+            '''
             if (status == 8) { unstable 'policy violation' }
             else if (status != 0) { error 'bridge failure' }
           }
