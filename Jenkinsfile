@@ -37,11 +37,13 @@ pipeline {
       steps {
         sh '''
           BRIDGE=https://sig-repo.synopsys.com/artifactory/bds-integrations-release/com/synopsys/integration/synopsys-action/0.1.72/ci-package-0.1.72-linux64.zip
-          BRIDGE_POLARIS_SERVERURL=$POLARIS_SERVER_URL
           BRIDGE_POLARIS_ACCESSTOKEN=$POLARIS_ACCESS_TOKEN
+
+          BRIDGE_POLARIS_SERVERURL=$POLARIS_SERVER_URL
           BRIDGE_POLARIS_APPLICATION_NAME=$APPLICATION
           BRIDGE_POLARIS_PROJECT_NAME=$PROJECT
 
+          echo "URL [$BRIDGE_POLARIS_SERVERURL]"
           curl -fLsS -o $WORKSPACE_TMP/bridge.zip $BRIDGE
           unzip -qo -d $WORKSPACE_TMP/bridge $WORKSPACE_TMP/bridge.zip
           $WORKSPACE_TMP/bridge/bridge --stage polaris polaris.assessment.types='["SAST","SCA"]'
