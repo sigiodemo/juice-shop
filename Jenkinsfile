@@ -38,7 +38,7 @@ pipeline {
       steps {
         withCredentials([string(credentialsId: 'POLARIS_TOKEN', variable: 'BRIDGE_POLARIS_ACCESSTOKEN')]) {
           script {
-            status = sh returnStatus: true, script: '''
+            status = sh returnStatus: true, script: """
               export BRIDGE_POLARIS_SERVERURL=$POLARIS_SERVER_URL
               export BRIDGE_POLARIS_APPLICATION_NAME=$APPLICATION
               export BRIDGE_POLARIS_PROJECT_NAME=$PROJECT
@@ -46,7 +46,7 @@ pipeline {
               curl -fLsS -o $WORKSPACE_TMP/bridge.zip $BRIDGE
               unzip -qo -d $WORKSPACE_TMP/bridge $WORKSPACE_TMP/bridge.zip
               $WORKSPACE_TMP/bridge/bridge --stage polaris polaris.assessment.types='["SAST","SCA"]'
-            '''
+            """
             if (status == 8) { unstable 'policy violation' }
             else if (status != 0) { error 'bridge failure' }
           }
