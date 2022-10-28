@@ -9,6 +9,14 @@ pipeline {
     VERSION = '1.0'
     BRANCH = 'main'
     WORKSPACE_TMP = '/tmp'
+
+    SEEKER_TOKEN = credentials('SEEKER_TOKEN')
+    SERVER_START = "npm test"
+    SEEKER_STUFF = "java -javaagent:seeker/seeker-agent.jar -jar target/jhipster-sample-application-0.0.1-SNAPSHOT.jar"
+    SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
+    SERVER_WORKINGDIR = ""
+    SEEKER_RUN_TIME = 180
+    SEEKER_PROJECT_KEY = 'jshop'
   }
 
   stages{
@@ -53,6 +61,41 @@ pipeline {
         }
       }
     }
+
+    stage ('IAST - Seeker') {
+      steps {
+        withCredentials([string(credentialsId: 'SEEKER_TOKEN', variable: 'SEEKER_TOKEN')]) {
+        """#!/bin/bash
+          if [ ! -z ${SERVER_WORKINGDIR} ]; then cd ${SERVER_WORKINGDIR}; fi
+
+          sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=${SEEKER_PROJECT_KEY}&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
+
+          export SEEKER_PROJECT_VERSION=${VERSION}
+          export SEEKER_AGENT_NAME=${AGENT}
+          export MAVEN_OPTS=-javaagent:seeker/seeker-agent.jar
+
+          serverMessage=$(/tmp/serverStart.sh --startCmd="${SERVER_START}" --startedString="${SERVER_STRING}" --project="${PROJECT}" --timeout="60s" &)
+          if [[ $serverMessage == ?(-)+([0-9]) ]]; then #Check if value passed back is numeric (PID) or string (Error message).
+            echo "Running IAST Tests"
+
+            testRunID=$(curl -X 'POST' "${SEEKER_SERVER_URL}/rest/api/latest/testruns" -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -H "Authorization: ${SEEKER_TOKEN}" -d "type=AUTO_TRIAGE&statusKey=FIXED&projectKey=${SEEKER_PROJECT_KEY}" | jq -r ".[]".key)
+            echo "Run ID is : "$testRunID
+
+            # Give Seeker some time to do it's stuff; API collation, testing etc.
+            sleep ${SEEKER_RUN_TIME}
+
+            testResponse=$(curl -X 'PUT' "${SEEKER_SERVER_URL}/rest/api/latest/testruns/$testRunID/close" -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -H "Authorization: ${SEEKER_TOKEN}" -d 'completed=true')
+            echo "Finished Testing. [$testResponse]"
+
+            kill $serverMessage
+          else
+            echo $serverMessage
+            return 1
+          fi
+        """
+      }
+    }
+
 
     stage('Clean Workspace') {
       steps {
