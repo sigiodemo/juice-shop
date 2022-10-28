@@ -65,7 +65,7 @@ pipeline {
     stage ('IAST - Seeker') {
       steps {
         withCredentials([string(credentialsId: 'SEEKER_TOKEN', variable: 'SEEKER_TOKEN')]) {
-        """#!/bin/bash
+        '''#!/bin/bash
           if [ ! -z ${SERVER_WORKINGDIR} ]; then cd ${SERVER_WORKINGDIR}; fi
 
           sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=${SEEKER_PROJECT_KEY}&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
@@ -92,7 +92,7 @@ pipeline {
             echo $serverMessage
             return 1
           fi
-        """
+        '''
       }
     }
 
